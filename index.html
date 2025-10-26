@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GyanMap AI Career Chatbot</title>
+<style>
+body { font-family: Arial; background: #f5f6fa; }
+#chatbox { width: 90%; max-width: 600px; margin: 40px auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 0 10px #ccc; }
+.msg { margin: 10px 0; }
+.user { text-align: right; color: #0078ff; }
+.bot { text-align: left; color: #333; }
+input { width: 60%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+button { padding: 10px 15px; border: none; background: #0078ff; color: white; border-radius: 8px; cursor: pointer; margin-left: 5px; }
+</style>
+</head>
+<body>
+<div id="chatbox">
+  <h2>💬 GyanMap AI Career Assistant</h2>
+  <div id="messages"></div>
+  <input id="userInput" placeholder="Type your interest or skill..." />
+  <button onclick="send()">Send</button>
+  <button onclick="startVoice()">🎤 Speak</button>
+</div>
+
+<script>
+async function send() {
+  const input = document.getElementById('userInput');
+  const msgBox = document.getElementById('messages');
+  const userText = input.value;
+  if (!userText) return;
+
+  msgBox.innerHTML += `<div class="msg user">${userText}</div>`;
+  input.value = '';
+
+  const res = await fetch('/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: userText })
+  });
+
+  const data = await res.json();
+  msgBox.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+  msgBox.scrollTop = msgBox.scrollHeight;
+}
+
+// 🎙️ Voice input function
+function startVoice() {
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = 'en-IN';
+  recognition.onresult = function(event) {
+    document.getElementById('userInput').value = event.results[0][0].transcript;
+  };
+  recognition.start();
+}
+</script>
+</body>
+</html>
